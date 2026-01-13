@@ -22,17 +22,20 @@ OUTBOX = BASE / "outbox_prompts"
 
 COORD_FILE = BASE / "chatgpt_input_xy.json"
 
-FILE_STABILIZE_SEC = 0.25
 
-# automation timing
+
+# automation timing 
 COUNTDOWN_SECONDS = 5
-FOCUS_DELAY_SEC = 0.20
-PASTE_DELAY_SEC = 0.10
-ENTER_DELAY_SEC = 0.10
+FOCUS_DELAY_SEC = 0.5   
+PASTE_DELAY_SEC = 0.5   
+ENTER_DELAY_SEC = 0.5   
 RETRY_PASTE = 2
 
 MAX_LIST_ITEMS = 14
-
+FILE_STABILIZE_SEC = 0.25
+CLICK_RETRIES = 3
+CLICK_INTERVAL_SEC = 0.12
+FOCUS_VERIFY_TYPE = True  
 pyautogui.FAILSAFE = True
 
 # ====================== HARDCODED DATABASE ======================
@@ -119,7 +122,7 @@ ISRAEL_CARDS = [
 ISRAEL_DB = {c["No"]: c for c in ISRAEL_CARDS}
 
 
-====================== UTILS ======================
+#====================== UTILS ======================
 
 def _is_blank(x: Any) -> bool:
     return x is None or x == "" or x == {} or x == []
@@ -542,14 +545,42 @@ def paste_into_open_chatgpt(prompt: str) -> None:
         print(f"[AUTO] {i}...", flush=True)
         time.sleep(1)
 
+    # 1) 클립보드에 넣기
     pyperclip.copy(prompt)
     time.sleep(0.05)
 
+    # 2) 입력창 포커스 강제 확보
     time.sleep(FOCUS_DELAY_SEC)
-    pyautogui.click(xy["x"], xy["y"])
+
+    # 클릭 여러 번 (좌표가 살짝 빗나가도 확률 ↑)
+    for _ in range(CLICK_RETRIES):
+        pyautogui.click(xy["x"], xy["y"])
+        time.sleep(CLICK_INTERVAL_SEC)
+
+    # 팝업/선택 상태 해제
+    pyautogui.press("esc")
+    time.sleep(0.05)
+
+    # 포커스 검증용: 아주 짧게 입력했다가 undo
+    # (입력창에 포커스가 없으면 이 동작이 실패하거나 엉뚱한 곳에 들어가는데,
+    #  그 경우에도 아래 ctrl+a를 최소화하기 위해 한 번 더 클릭)
+    if FOCUS_VERIFY_TYPE:
+        try:
+            pyautogui.write(" ")
+            time.sleep(0.03)
+            pyautogui.hotkey("ctrl", "z")
+            time.sleep(0.03)
+        except Exception:
+            pass
+
+    # 3) 이제 “입력창”에 포커스가 있다고 가정하고 clear → paste → enter
     time.sleep(PASTE_DELAY_SEC)
 
-    # clear box then paste
+    # 가끔 클릭이 빗나가면 ctrl+a가 페이지 전체선택을 하므로,
+    # ctrl+a 전에 한 번 더 클릭해서 안정성 ↑
+    pyautogui.click(xy["x"], xy["y"])
+    time.sleep(0.05)
+
     pyautogui.hotkey("ctrl", "a")
     time.sleep(0.03)
     pyautogui.hotkey("ctrl", "v")
@@ -557,7 +588,8 @@ def paste_into_open_chatgpt(prompt: str) -> None:
     pyautogui.press("enter")
 
 
-# ------------------ Watchdog Handler ------------------
+
+# ====================== Watchdog Handler (순서 최적화됨) ======================
 class Handler(FileSystemEventHandler):
     def on_created(self, event):
         if event.is_directory:
@@ -571,11 +603,11 @@ class Handler(FileSystemEventHandler):
             data = read_json_with_retry(path)
             prompt = build_prompt(data)
 
-            OUTBOX.mkdir(exist_ok=True)
-            (OUTBOX / f"{path.stem}.prompt.txt").write_text(prompt, encoding="utf-8")
+            print(f"[INFO] Detected: {path.name}", flush=True)
 
-            print(f"[INFO] Injecting: {path.name}", flush=True)
-
+            # ---------------------------------------------------------
+            # [수정 1] "붙여넣기"를 파일 저장보다 먼저 실행 (우선순위 높임)
+            # ---------------------------------------------------------
             last_err = None
             for attempt in range(RETRY_PASTE + 1):
                 try:
@@ -585,14 +617,28 @@ class Handler(FileSystemEventHandler):
                 except Exception as e:
                     last_err = e
                     print(f"[WARN] paste attempt {attempt+1} failed: {e}", flush=True)
-                    time.sleep(0.8)
+                    time.sleep(1.0) # 실패 시 1초 대기
 
             if last_err:
                 raise last_err
 
+            # ---------------------------------------------------------
+            # [수정 2] 프롬프트 내용을 .txt 파일로 저장 (혼란 방지용!)
+            # ---------------------------------------------------------
+            OUTBOX.mkdir(exist_ok=True)
+            output_txt_path = OUTBOX / f"{path.stem}.prompt.txt"  # .json -> .txt로 변경
+            
+            with open(output_txt_path, "w", encoding="utf-8") as f:
+                f.write(prompt)  # 복잡한 JSON 포장 없이 텍스트만 저장
+
+            # ---------------------------------------------------------
+            # [수정 3] 파일 이동
+            # ---------------------------------------------------------
             PROCESSED.mkdir(exist_ok=True)
             shutil.move(str(path), str(PROCESSED / path.name))
-            print(f"[OK] Sent + moved: {path.name}", flush=True)
+            
+            # 로그 메시지도 수정
+            print(f"[OK] Pasted & Saved TXT: {output_txt_path.name}", flush=True)
 
         except Exception as e:
             FAILED.mkdir(exist_ok=True)
@@ -601,7 +647,6 @@ class Handler(FileSystemEventHandler):
             except Exception:
                 pass
             print(f"[FAIL] {path.name}: {e}", flush=True)
-
 
 def ensure_dirs():
     for d in (INBOX, PROCESSED, FAILED, OUTBOX):
