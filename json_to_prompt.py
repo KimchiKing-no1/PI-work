@@ -119,14 +119,12 @@ ISRAEL_CARDS = [
 ISRAEL_DB = {c["No"]: c for c in ISRAEL_CARDS}
 
 
-# ====================== UTILS ======================
+====================== UTILS ======================
 
 def _is_blank(x: Any) -> bool:
     return x is None or x == "" or x == {} or x == []
 
-# Moved UP so it is defined before use
-def dump_json_block(obj) -> list[str]:
-    import json
+def dump_json_block(obj: Any) -> List[str]:
     return ["```json", json.dumps(obj, ensure_ascii=False, indent=2), "```"]
 
 def summarize(v: Any, max_items: int = MAX_LIST_ITEMS) -> str:
@@ -173,7 +171,6 @@ def read_json_with_retry(path: Path, retries: int = 12, delay: float = 0.15) -> 
 
 
 def unwrap_state(payload: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
-    # payload could be {"game_id":..., "side":..., "state":{...}}
     if isinstance(payload, dict) and isinstance(payload.get("state"), dict):
         return payload, payload["state"]
     return payload, payload
@@ -267,7 +264,6 @@ def extract_turn_info(outer: Dict[str, Any], st: Dict[str, Any]) -> Tuple[Option
     side = normalize_side(side_raw)
     return map_turn, segment, phase, side
 
-
 def extract_points(st: Dict[str, Any]) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
     r = st.get("r") if isinstance(st.get("r"), dict) else None
     players = st.get("players") if isinstance(st.get("players"), dict) else None
@@ -338,7 +334,8 @@ def build_prompt(payload: Dict[str, Any]) -> str:
     blue_pts, red_pts = extract_points(st)
     opinion = extract_opinion(st)
     rivers = extract_rivers(st)
-
+    air_defense = get_first(st, ["air_defense_posture", "ad", "defense_posture"])
+    deployed_defenses = get_first(st, ["sd", "deployed_units", "defenses"])
     queue = get_first(st, ["active_events_queue", "queue", "queues", "planned_actions", "planned"])
     readiness = get_first(st, ["as", "readiness", "forces", "air", "aircraft", "squadrons", "units"])
     upgrades = get_first(st, ["u", "upgrades"])
@@ -371,7 +368,7 @@ def build_prompt(payload: Dict[str, Any]) -> str:
         lines.append(f"- Red (Iran): MP {red_pts.get('mp')}, IP {red_pts.get('ip')}, PP {red_pts.get('pp')}")
     else:
         lines.append("- Red (Iran): (missing)")
-
+    
     lines.append("")
     lines.append("OPINION TRACKS")
     if isinstance(opinion, dict):
@@ -431,7 +428,20 @@ def build_prompt(payload: Dict[str, Any]) -> str:
                     lines.append(f"   Notes: {details.get('Notes')}")
             else:
                 lines.append(f"• [{cid}] (Text not found in internal database)")
+    lines.append("")
+    lines.append("AIR DEFENSE POSTURE (CRITICAL)")
+    if not air_defense:
+        lines.append("- None (explicit) or Unknown.")
+    else:
+        
+        lines.extend(dump_json_block(air_defense))
 
+    lines.append("")
+    lines.append("DEPLOYED DEFENSES (SD)")
+    if not deployed_defenses:
+        lines.append("- None (explicit).")
+    else:
+        lines.extend(dump_json_block(deployed_defenses))
     lines.append("")
     lines.append("QUEUED / PLANNED ACTIONS")
     if not queue:
