@@ -25,7 +25,7 @@ COORD_FILE = BASE / "chatgpt_input_xy.json"
 FILE_STABILIZE_SEC = 0.25
 
 # automation timing
-COUNTDOWN_SECONDS = 5       
+COUNTDOWN_SECONDS = 5
 FOCUS_DELAY_SEC = 0.20
 PASTE_DELAY_SEC = 0.10
 ENTER_DELAY_SEC = 0.10
@@ -33,16 +33,101 @@ RETRY_PASTE = 2
 
 MAX_LIST_ITEMS = 14
 
-pyautogui.FAILSAFE = True  
-# ====================================================
+pyautogui.FAILSAFE = True
+
+# ====================== HARDCODED DATABASE ======================
+IRAN_CARDS = [
+    {"No": 1, "Name": "Ahmadinejad Speech", "Quantity": 3, "Cost": "1P", "Effect": "3● Ir Domest, Is Domestic, SA, J, T, R, C, US", "Notes": "Backfire 7 - Opponent Rolls"},
+    {"No": 2, "Name": "Antiwar Protests", "Quantity": 2, "Cost": "6P", "Effect": "4●+4● Is Domestic, US, UN", "Notes": ""},
+    {"No": 3, "Name": "Appeal to the Faithful", "Quantity": 1, "Cost": "3P", "Effect": "1● Ir Domestic", "Notes": ""},
+    {"No": 4, "Name": "Arms Purchase", "Quantity": 1, "Cost": "5M", "Effect": "Immediately receive any combination of upgrades costing up to 40 points", "Notes": "Supplying nation must be Supporter or Ally"},
+    {"No": 5, "Name": "Black Market", "Quantity": 2, "Cost": "--", "Effect": "For every three points spent receive 1 point of any type the player chooses", "Notes": "+1 point of retrieved card’s first cost"},
+    {"No": 6, "Name": "Careful Planning", "Quantity": 3, "Cost": "2P", "Effect": "Retrieve 1 card from discard", "Notes": ""},
+    {"No": 7, "Name": "Collateral Damage", "Quantity": 3, "Cost": "2P", "Effect": "1●+1●+1● SA, J, T, R, US, UN", "Notes": "Requires: Israel has launched an airstrike this Map Turn"},
+    {"No": 8, "Name": "Crackdown on Dissent", "Quantity": 2, "Cost": "2M", "Effect": "1● Ir Domestic", "Notes": "Backfire 8 - Opponent Rolls"},
+    {"No": 9, "Name": "Carnage for the Cameras", "Quantity": 1, "Cost": "4P", "Effect": "1●+1● SA, J, T, R, US, UN", "Notes": "Dirty"},
+    {"No": 10, "Name": "Fanning the Flames", "Quantity": 2, "Cost": "4P", "Effect": "1● SA, J, T, UN + 1● UN", "Notes": ""},
+    {"No": 11, "Name": "Friendship Prices", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● UN, C", "Notes": ""},
+    {"No": 12, "Name": "Funding Opposition", "Quantity": 1, "Cost": "3I", "Effect": "3● Is Domestic", "Notes": "Covert"},
+    {"No": 13, "Name": "High-Level Indecision", "Quantity": 1, "Cost": "4I", "Effect": "Discard a card from opponent’s River", "Notes": ""},
+    {"No": 14, "Name": "Human Interest Story", "Quantity": 1, "Cost": "2P", "Effect": "3● IS, US, UN, SA, J", "Notes": ""},
+    {"No": 15, "Name": "Illicit Bribery", "Quantity": 1, "Cost": "5I", "Effect": "Discard 2 cards (random) from opponent’s River", "Notes": "Dirty"},
+    {"No": 16, "Name": "Incriminating Photos", "Quantity": 2, "Cost": "4P", "Effect": "4● Ir Domestic, J, SA, T", "Notes": "Dirty"},
+    {"No": 17, "Name": "International Divestment", "Quantity": 1, "Cost": "2P", "Effect": "3● US, UN", "Notes": ""},
+    {"No": 18, "Name": "Israeli Condemnation", "Quantity": 1, "Cost": "7P", "Effect": "7● Is Domestic", "Notes": ""},
+    {"No": 19, "Name": "Major Expose", "Quantity": 2, "Cost": "3P", "Effect": "4●+4●+4● Ir Domestic, SA, J, T, R, C, US, UN", "Notes": "Requires last opponent act to be Dirty"},
+    {"No": 20, "Name": "Official Coverup", "Quantity": 2, "Cost": "2P, 2I, 2M", "Effect": "Cancel Strategic Event", "Notes": "Covert"},
+    {"No": 21, "Name": "On-Call Kill Team", "Quantity": 1, "Cost": "5I", "Effect": "Cancel opponent’s card whose first cost is I", "Notes": "Covert"},
+    {"No": 22, "Name": "OPEC Diplomacy", "Quantity": 1, "Cost": "5P", "Effect": "3●+3● SA, J, C", "Notes": ""},
+    {"No": 23, "Name": "Palestinian Unrest", "Quantity": 2, "Cost": "3P", "Effect": "1● SA, J, T + 1D 3● Is Domestic", "Notes": "Dirty"},
+    {"No": 24, "Name": "Plausible Deniability", "Quantity": 1, "Cost": "3P", "Effect": "4● SA, J, T or 3● Is Domestic", "Notes": "Dirty. Requires: Must have captured at least one Israeli POW"},
+    {"No": 25, "Name": "POWs on TV", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● Is Domestic, Ir Domestic, UN", "Notes": ""},
+    {"No": 26, "Name": "Press Leak", "Quantity": 2, "Cost": "3P", "Effect": "3●+3●+3● SA, J, T, R, C, US, UN", "Notes": "Requires: Last opponent act was Covert or Dirty"},
+    {"No": 27, "Name": "Promised Concessions", "Quantity": 1, "Cost": "4P", "Effect": "3●+3● R, C, US", "Notes": ""},
+    {"No": 28, "Name": "Propaganda Barrage", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● SA, J, T", "Notes": ""},
+    {"No": 29, "Name": "Protests in Tel Aviv", "Quantity": 1, "Cost": "5P", "Effect": "4● Is Domestic", "Notes": ""},
+    {"No": 30, "Name": "Quick Spin Control", "Quantity": 1, "Cost": "6P", "Effect": "Cancel opponent’s card whose first cost is P", "Notes": ""},
+    {"No": 31, "Name": "Radical Elements", "Quantity": 1, "Cost": "4P", "Effect": "3●+3● SA, J, T", "Notes": "Backfire 10 - Opponent Rolls"},
+    {"No": 32, "Name": "Sleeper Agent", "Quantity": 2, "Cost": "4I", "Effect": "Look at opponent’s River", "Notes": ""},
+    {"No": 33, "Name": "Staged Protest", "Quantity": 1, "Cost": "4I", "Effect": "3● IS, UN", "Notes": ""},
+    {"No": 34, "Name": "Superpower Pressure", "Quantity": 1, "Cost": "4P", "Effect": "5● SA, T", "Notes": "Requires either R or C Supporter or Ally"}
+]
+# Renamed to match the lookup function logic
+IRAN_DB = {c["No"]: c for c in IRAN_CARDS}
+
+ISRAEL_CARDS = [
+    {"No": 1, "Name": "Appeal to the Electorate", "Quantity": 1, "Cost": "3P", "Effect": "1● Is Domestic", "Notes": ""},
+    {"No": 2, "Name": "Arms Purchase", "Quantity": 1, "Cost": "5M", "Effect": "Immediately receive any combination of upgrades costing up to 40 points", "Notes": "Supplying nation must be Supporter or Ally"},
+    {"No": 3, "Name": "Black Market", "Quantity": 2, "Cost": "--", "Effect": "For every three points spent receive 1 point of any type the player chooses", "Notes": "+1 point of retrieved card’s first cost"},
+    {"No": 4, "Name": "Illicit Bribery", "Quantity": 1, "Cost": "5I", "Effect": "Discard 2 cards (random) from opponent’s River", "Notes": "Dirty"},
+    {"No": 5, "Name": "Careful Planning", "Quantity": 2, "Cost": "2P", "Effect": "Retrieve 1 card from discard", "Notes": ""},
+    {"No": 6, "Name": "Collective Anxiety", "Quantity": 1, "Cost": "4P", "Effect": "4●+4● SA, J, T, Is domestic", "Notes": ""},
+    {"No": 7, "Name": "Congressional Lobby", "Quantity": 1, "Cost": "2P", "Effect": "1● US", "Notes": ""},
+    {"No": 8, "Name": "Cruiser Deployment", "Quantity": 1, "Cost": "4M", "Effect": "Add Bunker Hull-class GC to ballistic Missile Defenses", "Notes": "US is Supporter or Ally"},
+    {"No": 9, "Name": "Destroyer Deployment", "Quantity": 1, "Cost": "3M", "Effect": "Add Burke-class DDG to ballistic Missile Defenses", "Notes": "US is Supporter or Ally"},
+    {"No": 10, "Name": "Fallout Zone Anxiety", "Quantity": 1, "Cost": "4P", "Effect": "4● SA, J, T", "Notes": ""},
+    {"No": 11, "Name": "Fanning the Flames", "Quantity": 1, "Cost": "4P", "Effect": "1● SA, J, T, UN + 1● UN", "Notes": ""},
+    {"No": 12, "Name": "Favorable Media", "Quantity": 2, "Cost": "4P", "Effect": "4●+4● US, R, UN, Is Domestic", "Notes": ""},
+    {"No": 13, "Name": "Firm Commitment", "Quantity": 2, "Cost": "5P", "Effect": "Choose one of the three required countries. The country’s Opinion Track cannot be moved at all for D6+3 Map Turns", "Notes": ""},
+    {"No": 14, "Name": "Flyover Negotiations", "Quantity": 3, "Cost": "5P", "Effect": "5● SA, T", "Notes": ""},
+    {"No": 15, "Name": "Focused Diplomacy", "Quantity": 2, "Cost": "4P", "Effect": "3● SA, J, T, US, R, C, UN", "Notes": ""},
+    {"No": 16, "Name": "Funding Opposition", "Quantity": 1, "Cost": "3I", "Effect": "3● Is Domestic", "Notes": "Covert"},
+    {"No": 17, "Name": "Gulfside Negotiations", "Quantity": 2, "Cost": "4P", "Effect": "4● SA, J", "Notes": ""},
+    {"No": 18, "Name": "High-Level Indecision", "Quantity": 1, "Cost": "4I", "Effect": "Discard a card from opponent’s River", "Notes": ""},
+    {"No": 19, "Name": "Incriminating Photos", "Quantity": 2, "Cost": "4P", "Effect": "4● Ir Domestic, J, SA, T", "Notes": "Dirty"},
+    {"No": 20, "Name": "Israeli Outrage", "Quantity": 2, "Cost": "3P", "Effect": "3● Is Domestic", "Notes": "Requires Iranian Overt act"},
+    {"No": 21, "Name": "Long-Term Interests", "Quantity": 1, "Cost": "5P", "Effect": "3●+3●+3● SA, US, C, UN", "Notes": ""},
+    {"No": 22, "Name": "Major Expose", "Quantity": 2, "Cost": "3P", "Effect": "4●+4●+4● Ir Domestic, SA, J, T, R, C, US, UN", "Notes": "Requires last opponent act to be Dirty"},
+    {"No": 23, "Name": "Manufactured Attack", "Quantity": 1, "Cost": "4I", "Effect": "4● SA, J, T, UN, Is Domestic", "Notes": "Dirty"},
+    {"No": 24, "Name": "Media Reaction", "Quantity": 1, "Cost": "3P", "Effect": "3●+3● US, R, UN", "Notes": "Requires previous Iranian Overt act"},
+    {"No": 25, "Name": "Nuclear Proof", "Quantity": 1, "Cost": "3P, 3I", "Effect": "3●+3● SA, J, T, US, R, C, US, UN, Is Domestic", "Notes": "Requires at least 1 nuclear target destroyed or crippled"},
+    {"No": 26, "Name": "Official Coverup", "Quantity": 2, "Cost": "2P, 2I, 2M", "Effect": "Cancel Strategic Event", "Notes": ""},
+    {"No": 27, "Name": "On-Call Kill Team", "Quantity": 1, "Cost": "5I", "Effect": "Cancel opponent’s card whose first cost is I", "Notes": "Covert"},
+    {"No": 28, "Name": "Overzealous Pasdaran", "Quantity": 1, "Cost": "3P", "Effect": "4●+4● SA, J, T, US, UN, Is Domestic", "Notes": "Add Cost 3I. Requires previous Iranian Overt"},
+    {"No": 29, "Name": "Plausible Deniability", "Quantity": 1, "Cost": "5I", "Effect": "4● SA, J, T or 3● Ir Domestic", "Notes": "Dirty"},
+    {"No": 30, "Name": "Press Leak", "Quantity": 2, "Cost": "3P", "Effect": "3●+3●+3● SA, J, T, R, C, US, UN", "Notes": "Requires: Last opponent act was Covert or Dirty"},
+    {"No": 31, "Name": "Protests in Tehran", "Quantity": 2, "Cost": "5P", "Effect": "4● Ir Domestic", "Notes": ""},
+    {"No": 32, "Name": "Quick Spin Control", "Quantity": 1, "Cost": "6P", "Effect": "Cancel opponent’s card whose first cost is P", "Notes": ""},
+    {"No": 33, "Name": "Sleeper Agent", "Quantity": 2, "Cost": "4I", "Effect": "Look at opponent’s River", "Notes": ""},
+    {"No": 34, "Name": "Speech of Support", "Quantity": 2, "Cost": "3P", "Effect": "3● US, Is domestic", "Notes": ""},
+    {"No": 35, "Name": "Technology Transfer", "Quantity": 1, "Cost": "4M", "Effect": "3● C, R", "Notes": "Backfire – Ir receives 3● US."},
+    {"No": 36, "Name": "UN Resolution", "Quantity": 1, "Cost": "1P", "Effect": "1● UN, Is Domestic", "Notes": "Israel still 3● C, R, dice if Backfire is rolled."},
+    {"No": 37, "Name": "Widespread Condemnation", "Quantity": 1, "Cost": "7P", "Effect": "7● Ir Domestic", "Notes": "Israel still 3● C, R, dice if Backfire is rolled."},
+    {"No": 38, "Name": "Worried Leaders", "Quantity": 1, "Cost": "7P", "Effect": "4●+4●+4● SA,J,T,R,C,UN, US", "Notes": ""}
+]
+# Renamed to match the lookup function logic
+ISRAEL_DB = {c["No"]: c for c in ISRAEL_CARDS}
 
 
-
-
+# ====================== UTILS ======================
 
 def _is_blank(x: Any) -> bool:
     return x is None or x == "" or x == {} or x == []
 
+# Moved UP so it is defined before use
+def dump_json_block(obj) -> list[str]:
+    import json
+    return ["```json", json.dumps(obj, ensure_ascii=False, indent=2), "```"]
 
 def summarize(v: Any, max_items: int = MAX_LIST_ITEMS) -> str:
     if v is None:
@@ -102,24 +187,67 @@ def get_first(d: Any, keys: List[str]) -> Any:
             return d[k]
     return None
 
+# ====================== CARD LOOKUP LOGIC ======================
 
-def label_card(side_norm: str, card_id):
+def get_card_details(data: Dict[str, Any], side_label: str, card_id: int) -> Optional[Dict[str, Any]]:
+    """
+    Looks up card info from the GLOBAL hardcoded dictionaries (ISRAEL_DB / IRAN_DB).
+    We ignore the 'data' argument here as we use the hardcoded DB.
+    """
+    # 1. Determine which side we are looking for
+    s = str(side_label).lower()
+    
+    target_db = None
+    if "isr" in s or "blue" in s:
+        target_db = ISRAEL_DB
+    elif "iran" in s or "red" in s:
+        target_db = IRAN_DB
+    
+    if target_db is None:
+        return None
+
+    # 2. Lookup by ID (ensure int)
     try:
-        n = int(card_id)
-    except Exception:
-        return str(card_id)
+        cid = int(card_id)
+    except ValueError:
+        return None
 
-    if "Israel" in side_norm:
-        c = ISRAEL_CARD_MAP.get(n)
-    elif "Iran" in side_norm:
-        c = IRAN_CARD_MAP.get(n)
-    else:
-        c = ISRAEL_CARD_MAP.get(n) or IRAN_CARD_MAP.get(n)
+    card_data = target_db.get(cid)
 
-    name = c.get("Name") if isinstance(c, dict) else None
-    return f"{n} — {name}" if name else str(n)
+    # 3. Format into the structure build_prompt expects
+    if card_data:
+        # Construct a full text string from your DB fields
+        cost = card_data.get("Cost", "--")
+        effect = card_data.get("Effect", "No effect listed")
+        notes = card_data.get("Notes", "")
+        
+        full_text_str = f"Cost: {cost} | Effect: {effect}"
+        if notes:
+            full_text_str += f" | Notes: {notes}"
+
+        return {
+            "title": card_data.get("Name"),
+            "full_text": full_text_str,
+            "source": "Hardcoded DB",
+            # Pass raw fields too if needed
+            "Name": card_data.get("Name"),
+            "Cost": cost,
+            "Effect": effect,
+            "Notes": notes
+        }
+    
+    return None
+
+def label_card(data: Dict[str, Any], side_label: str, cid: int) -> str:
+    # Use the function above to find the name
+    details = get_card_details(data, side_label, cid)
+    if details:
+        title = details.get("title") or "Unknown"
+        return f"{cid} — {title}"
+    return f"{cid} — (title unknown)"
 
 
+# ====================== PROMPT BUILDER ======================
 
 def extract_turn_info(outer: Dict[str, Any], st: Dict[str, Any]) -> Tuple[Optional[Any], Optional[str], Optional[str]]:
     turn = st.get("turn") if isinstance(st.get("turn"), dict) else (st.get("t") if isinstance(st.get("t"), dict) else {})
@@ -203,20 +331,6 @@ def extract_rivers(st: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         return river
     return None
 
-def get_card_details(side_norm: str, card_id: Any) -> Optional[Dict[str, Any]]:
-    try:
-        n = int(card_id)
-    except:
-        return None
-    
-    # Check which side owns the card to look up the correct text
-    if "Israel" in side_norm:
-        return ISRAEL_CARD_MAP.get(n)
-    elif "Iran" in side_norm:
-        return IRAN_CARD_MAP.get(n)
-    else:
-        # Fallback: check both if side is unclear
-        return ISRAEL_CARD_MAP.get(n) or IRAN_CARD_MAP.get(n)
 
 def build_prompt(payload: Dict[str, Any]) -> str:
     outer, st = unwrap_state(payload)
@@ -264,7 +378,6 @@ def build_prompt(payload: Dict[str, Any]) -> str:
         d = opinion.get("d") or opinion.get("domestic") or {}
         tp = opinion.get("tp") or opinion.get("third_parties") or {}
 
-        # [FIXED INDENTATION]
         lines.append(f"- Domestic: Israel {d.get('i', 0)}, Iran {d.get('r', 0)}")
         lines.append(
             "- Third Parties: "
@@ -293,7 +406,8 @@ def build_prompt(payload: Dict[str, Any]) -> str:
                     if cid is None:
                         slots.append(f"{i+1}:(empty)")
                     else:
-                        label = label_card(side_label, cid)
+                        # Use payload data if needed, but here we just need ID to hit DB
+                        label = label_card(payload, side_label, cid)
                         slots.append(f"{i+1}:[{label}]")
                         # Save for the reference section below
                         cards_to_reference.add((side_label, cid))
@@ -307,8 +421,8 @@ def build_prompt(payload: Dict[str, Any]) -> str:
     if cards_to_reference:
         lines.append("")
         lines.append("CARD TEXT REFERENCE (Authoritative)")
-        for side_label, cid in cards_to_reference:
-            details = get_card_details(side_label, cid)
+        for side_label, cid in sorted(list(cards_to_reference), key=lambda x: (x[0], x[1])):
+            details = get_card_details(payload, side_label, cid)
             if details:
                 # Format: [ID] Name | Cost: X | Effect: Y
                 lines.append(f"• [{cid}] {details.get('Name', 'Unknown')}")
@@ -323,49 +437,49 @@ def build_prompt(payload: Dict[str, Any]) -> str:
     if not queue:
         lines.append("- None (explicit): No planned/queued actions exist.")
     else:
-        lines.append(f"- {summarize(queue)}")
+        lines.extend(dump_json_block(queue))
 
     lines.append("")
     lines.append("FORCE READINESS")
     if not readiness:
         lines.append("- None (explicit): Treat as unknown/default.")
     else:
-        lines.append(f"- {summarize(readiness)}")
+        lines.extend(dump_json_block(readiness))
 
     lines.append("")
     lines.append("BALLISTIC MISSILES")
     if not bm:
         lines.append("- None (explicit): Treat as unknown.")
     else:
-        lines.append(f"- {summarize(bm)}")
+        lines.extend(dump_json_block(bm))
 
     lines.append("")
     lines.append("SPECIAL WARFARE")
     if not swm:
         lines.append("- None (explicit): No SWM active.")
     else:
-        lines.append(f"- {summarize(swm)}")
+        lines.extend(dump_json_block(swm))
 
     lines.append("")
     lines.append("UPGRADES")
     if not upgrades:
         lines.append("- None (explicit): No upgrades active.")
     else:
-        lines.append(f"- {summarize(upgrades)}")
+        lines.extend(dump_json_block(upgrades))
 
     lines.append("")
     lines.append("STRATEGIC EFFECTS")
     if not strategic:
         lines.append("- None (explicit): No strategic effects.")
     else:
-        lines.append(f"- {summarize(strategic)}")
+        lines.extend(dump_json_block(strategic))
 
     lines.append("")
     lines.append("DAMAGE / LOSSES")
     if not damage:
         lines.append("- None (explicit): No damage.")
     else:
-        lines.append(f"- {summarize(damage)}")
+        lines.extend(dump_json_block(damage))
 
     if notes:
         lines.append("")
@@ -382,85 +496,7 @@ def build_prompt(payload: Dict[str, Any]) -> str:
 
     return "\n".join(lines)
 
-IRAN_CARDS = [
-    {"No": 1, "Name": "Ahmadinejad Speech", "Quantity": 3, "Cost": "1P", "Effect": "3● Ir Domest, Is Domestic, SA, J, T, R, C, US", "Notes": "Backfire 7 - Opponent Rolls"},
-    {"No": 2, "Name": "Antiwar Protests", "Quantity": 2, "Cost": "6P", "Effect": "4●+4● Is Domestic, US, UN", "Notes": ""},
-    {"No": 3, "Name": "Appeal to the Faithful", "Quantity": 1, "Cost": "3P", "Effect": "1● Ir Domestic", "Notes": ""},
-    {"No": 4, "Name": "Arms Purchase", "Quantity": 1, "Cost": "5M", "Effect": "Immediately receive any combination of upgrades costing up to 40 points", "Notes": "Supplying nation must be Supporter or Ally"},
-    {"No": 5, "Name": "Black Market", "Quantity": 2, "Cost": "--", "Effect": "For every three points spent receive 1 point of any type the player chooses", "Notes": "+1 point of retrieved card’s first cost"},
-    {"No": 6, "Name": "Careful Planning", "Quantity": 3, "Cost": "2P", "Effect": "Retrieve 1 card from discard", "Notes": ""},
-    {"No": 7, "Name": "Collateral Damage", "Quantity": 3, "Cost": "2P", "Effect": "1●+1●+1● SA, J, T, R, US, UN", "Notes": "Requires: Israel has launched an airstrike this Map Turn"},
-    {"No": 8, "Name": "Crackdown on Dissent", "Quantity": 2, "Cost": "2M", "Effect": "1● Ir Domestic", "Notes": "Backfire 8 - Opponent Rolls"},
-    {"No": 9, "Name": "Carnage for the Cameras", "Quantity": 1, "Cost": "4P", "Effect": "1●+1● SA, J, T, R, US, UN", "Notes": "Dirty"},
-    {"No": 10, "Name": "Fanning the Flames", "Quantity": 2, "Cost": "4P", "Effect": "1● SA, J, T, UN + 1● UN", "Notes": ""},
-    {"No": 11, "Name": "Friendship Prices", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● UN, C", "Notes": ""},
-    {"No": 12, "Name": "Funding Opposition", "Quantity": 1, "Cost": "3I", "Effect": "3● Is Domestic", "Notes": "Covert"},
-    {"No": 13, "Name": "High-Level Indecision", "Quantity": 1, "Cost": "4I", "Effect": "Discard a card from opponent’s River", "Notes": ""},
-    {"No": 14, "Name": "Human Interest Story", "Quantity": 1, "Cost": "2P", "Effect": "3● IS, US, UN, SA, J", "Notes": ""},
-    {"No": 15, "Name": "Illicit Bribery", "Quantity": 1, "Cost": "5I", "Effect": "Discard 2 cards (random) from opponent’s River", "Notes": "Dirty"},
-    {"No": 16, "Name": "Incriminating Photos", "Quantity": 2, "Cost": "4P", "Effect": "4● Ir Domestic, J, SA, T", "Notes": "Dirty"},
-    {"No": 17, "Name": "International Divestment", "Quantity": 1, "Cost": "2P", "Effect": "3● US, UN", "Notes": ""},
-    {"No": 18, "Name": "Israeli Condemnation", "Quantity": 1, "Cost": "7P", "Effect": "7● Is Domestic", "Notes": ""},
-    {"No": 19, "Name": "Major Expose", "Quantity": 2, "Cost": "3P", "Effect": "4●+4●+4● Ir Domestic, SA, J, T, R, C, US, UN", "Notes": "Requires last opponent act to be Dirty"},
-    {"No": 20, "Name": "Official Coverup", "Quantity": 2, "Cost": "2P, 2I, 2M", "Effect": "Cancel Strategic Event", "Notes": "Covert"},
-    {"No": 21, "Name": "On-Call Kill Team", "Quantity": 1, "Cost": "5I", "Effect": "Cancel opponent’s card whose first cost is I", "Notes": "Covert"},
-    {"No": 22, "Name": "OPEC Diplomacy", "Quantity": 1, "Cost": "5P", "Effect": "3●+3● SA, J, C", "Notes": ""},
-    {"No": 23, "Name": "Palestinian Unrest", "Quantity": 2, "Cost": "3P", "Effect": "1● SA, J, T + 1D 3● Is Domestic", "Notes": "Dirty"},
-    {"No": 24, "Name": "Plausible Deniability", "Quantity": 1, "Cost": "3P", "Effect": "4● SA, J, T or 3● Is Domestic", "Notes": "Dirty. Requires: Must have captured at least one Israeli POW"},
-    {"No": 25, "Name": "POWs on TV", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● Is Domestic, Ir Domestic, UN", "Notes": ""},
-    {"No": 26, "Name": "Press Leak", "Quantity": 2, "Cost": "3P", "Effect": "3●+3●+3● SA, J, T, R, C, US, UN", "Notes": "Requires: Last opponent act was Covert or Dirty"},
-    {"No": 27, "Name": "Promised Concessions", "Quantity": 1, "Cost": "4P", "Effect": "3●+3● R, C, US", "Notes": ""},
-    {"No": 28, "Name": "Propaganda Barrage", "Quantity": 2, "Cost": "4P", "Effect": "3●+3● SA, J, T", "Notes": ""},
-    {"No": 29, "Name": "Protests in Tel Aviv", "Quantity": 1, "Cost": "5P", "Effect": "4● Is Domestic", "Notes": ""},
-    {"No": 30, "Name": "Quick Spin Control", "Quantity": 1, "Cost": "6P", "Effect": "Cancel opponent’s card whose first cost is P", "Notes": ""},
-    {"No": 31, "Name": "Radical Elements", "Quantity": 1, "Cost": "4P", "Effect": "3●+3● SA, J, T", "Notes": "Backfire 10 - Opponent Rolls"},
-    {"No": 32, "Name": "Sleeper Agent", "Quantity": 2, "Cost": "4I", "Effect": "Look at opponent’s River", "Notes": ""},
-    {"No": 33, "Name": "Staged Protest", "Quantity": 1, "Cost": "4I", "Effect": "3● IS, UN", "Notes": ""}, # Note: 'IS' likely means 'Israeli Domestic', confirmed from rulebook context.
-    {"No": 34, "Name": "Superpower Pressure", "Quantity": 1, "Cost": "4P", "Effect": "5● SA, T", "Notes": "Requires either R or C Supporter or Ally"}
-]
-IRAN_CARD_MAP = {c["No"]: c for c in IRAN_CARDS}
 
-ISRAEL_CARDS = [
-    {"No": 1, "Name": "Appeal to the Electorate", "Quantity": 1, "Cost": "3P", "Effect": "1● Is Domestic", "Notes": ""},
-    {"No": 2, "Name": "Arms Purchase", "Quantity": 1, "Cost": "5M", "Effect": "Immediately receive any combination of upgrades costing up to 40 points", "Notes": "Supplying nation must be Supporter or Ally"},
-    {"No": 3, "Name": "Black Market", "Quantity": 2, "Cost": "--", "Effect": "For every three points spent receive 1 point of any type the player chooses", "Notes": "+1 point of retrieved card’s first cost"},
-    {"No": 4, "Name": "Illicit Bribery", "Quantity": 1, "Cost": "5I", "Effect": "Discard 2 cards (random) from opponent’s River", "Notes": "Dirty"},
-    {"No": 5, "Name": "Careful Planning", "Quantity": 2, "Cost": "2P", "Effect": "Retrieve 1 card from discard", "Notes": ""},
-    {"No": 6, "Name": "Collective Anxiety", "Quantity": 1, "Cost": "4P", "Effect": "4●+4● SA, J, T, Is domestic", "Notes": ""},
-    {"No": 7, "Name": "Congressional Lobby", "Quantity": 1, "Cost": "2P", "Effect": "1● US", "Notes": ""},
-    {"No": 8, "Name": "Cruiser Deployment", "Quantity": 1, "Cost": "4M", "Effect": "Add Bunker Hull-class GC to ballistic Missile Defenses", "Notes": "US is Supporter or Ally"},
-    {"No": 9, "Name": "Destroyer Deployment", "Quantity": 1, "Cost": "3M", "Effect": "Add Burke-class DDG to ballistic Missile Defenses", "Notes": "US is Supporter or Ally"},
-    {"No": 10, "Name": "Fallout Zone Anxiety", "Quantity": 1, "Cost": "4P", "Effect": "4● SA, J, T", "Notes": ""},
-    {"No": 11, "Name": "Fanning the Flames", "Quantity": 1, "Cost": "4P", "Effect": "1● SA, J, T, UN + 1● UN", "Notes": ""},
-    {"No": 12, "Name": "Favorable Media", "Quantity": 2, "Cost": "4P", "Effect": "4●+4● US, R, UN, Is Domestic", "Notes": ""},
-    {"No": 13, "Name": "Firm Commitment", "Quantity": 2, "Cost": "5P", "Effect": "Choose one of the three required countries. The country’s Opinion Track cannot be moved at all for D6+3 Map Turns", "Notes": ""},
-    {"No": 14, "Name": "Flyover Negotiations", "Quantity": 3, "Cost": "5P", "Effect": "5● SA, T", "Notes": ""},
-    {"No": 15, "Name": "Focused Diplomacy", "Quantity": 2, "Cost": "4P", "Effect": "3● SA, J, T, US, R, C, UN", "Notes": ""},
-    {"No": 16, "Name": "Funding Opposition", "Quantity": 1, "Cost": "3I", "Effect": "3● Is Domestic", "Notes": "Covert"},
-    {"No": 17, "Name": "Gulfside Negotiations", "Quantity": 2, "Cost": "4P", "Effect": "4● SA, J", "Notes": ""},
-    {"No": 18, "Name": "High-Level Indecision", "Quantity": 1, "Cost": "4I", "Effect": "Discard a card from opponent’s River", "Notes": ""},
-    {"No": 19, "Name": "Incriminating Photos", "Quantity": 2, "Cost": "4P", "Effect": "4● Ir Domestic, J, SA, T", "Notes": "Dirty"},
-    {"No": 20, "Name": "Israeli Outrage", "Quantity": 2, "Cost": "3P", "Effect": "3● Is Domestic", "Notes": "Requires Iranian Overt act"},
-    {"No": 21, "Name": "Long-Term Interests", "Quantity": 1, "Cost": "5P", "Effect": "3●+3●+3● SA, US, C, UN", "Notes": ""},
-    {"No": 22, "Name": "Major Expose", "Quantity": 2, "Cost": "3P", "Effect": "4●+4●+4● Ir Domestic, SA, J, T, R, C, US, UN", "Notes": "Requires last opponent act to be Dirty"},
-    {"No": 23, "Name": "Manufactured Attack", "Quantity": 1, "Cost": "4I", "Effect": "4● SA, J, T, UN, Is Domestic", "Notes": "Dirty"},
-    {"No": 24, "Name": "Media Reaction", "Quantity": 1, "Cost": "3P", "Effect": "3●+3● US, R, UN", "Notes": "Requires previous Iranian Overt act"},
-    {"No": 25, "Name": "Nuclear Proof", "Quantity": 1, "Cost": "3P, 3I", "Effect": "3●+3● SA, J, T, US, R, C, US, UN, Is Domestic", "Notes": "Requires at least 1 nuclear target destroyed or crippled"},
-    {"No": 26, "Name": "Official Coverup", "Quantity": 2, "Cost": "2P, 2I, 2M", "Effect": "Cancel Strategic Event", "Notes": ""},
-    {"No": 27, "Name": "On-Call Kill Team", "Quantity": 1, "Cost": "5I", "Effect": "Cancel opponent’s card whose first cost is I", "Notes": "Covert"},
-    {"No": 28, "Name": "Overzealous Pasdaran", "Quantity": 1, "Cost": "3P", "Effect": "4●+4● SA, J, T, US, UN, Is Domestic", "Notes": "Add Cost 3I. Requires previous Iranian Overt"},
-    {"No": 29, "Name": "Plausible Deniability", "Quantity": 1, "Cost": "5I", "Effect": "4● SA, J, T or 3● Ir Domestic", "Notes": "Dirty"},
-    {"No": 30, "Name": "Press Leak", "Quantity": 2, "Cost": "3P", "Effect": "3●+3●+3● SA, J, T, R, C, US, UN", "Notes": "Requires: Last opponent act was Covert or Dirty"},
-    {"No": 31, "Name": "Protests in Tehran", "Quantity": 2, "Cost": "5P", "Effect": "4● Ir Domestic", "Notes": ""},
-    {"No": 32, "Name": "Quick Spin Control", "Quantity": 1, "Cost": "6P", "Effect": "Cancel opponent’s card whose first cost is P", "Notes": ""},
-    {"No": 33, "Name": "Sleeper Agent", "Quantity": 2, "Cost": "4I", "Effect": "Look at opponent’s River", "Notes": ""},
-    {"No": 34, "Name": "Speech of Support", "Quantity": 2, "Cost": "3P", "Effect": "3● US, Is domestic", "Notes": ""},
-    {"No": 35, "Name": "Technology Transfer", "Quantity": 1, "Cost": "4M", "Effect": "3● C, R", "Notes": "Backfire – Ir receives 3● US."},
-    {"No": 36, "Name": "UN Resolution", "Quantity": 1, "Cost": "1P", "Effect": "1● UN, Is Domestic", "Notes": "Israel still 3● C, R, dice if Backfire is rolled."}, # Typo fixed from 'Resoulution'
-    {"No": 37, "Name": "Widespread Condemnation", "Quantity": 1, "Cost": "7P", "Effect": "7● Ir Domestic", "Notes": "Israel still 3● C, R, dice if Backfire is rolled."},
-    {"No": 38, "Name": "Worried Leaders", "Quantity": 1, "Cost": "7P", "Effect": "4●+4●+4● SA,J,T,R,C,UN, US", "Notes": ""} # Typo fixed from ',J,'
-]
-ISRAEL_CARD_MAP = {c["No"]: c for c in ISRAEL_CARDS}
 # ------------------ XY Capture / Load ------------------
 def capture_click_point(countdown: int = COUNTDOWN_SECONDS) -> Dict[str, int]:
     print(f"[SETUP] {countdown} seconds later mouse pointer would be saved as  'ChatGPT prompt coordinates.", flush=True)
@@ -590,9 +626,6 @@ def main():
 
     observer.join()
 
-def dump_json_block(obj) -> list[str]:
-    import json
-    return ["```json", json.dumps(obj, ensure_ascii=False, indent=2), "```"]
 
 if __name__ == "__main__":
     try:
